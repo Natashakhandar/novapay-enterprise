@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaPay | Enterprise Digital Banking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --primary: #38bdf8;
+            --secondary: #818cf8;
+            --accent: #10b981;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(129, 140, 248, 0.15), transparent 25%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .brand {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .nav-links li {
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links li:hover, .nav-links li.active {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main);
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        /* Balance Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-balance {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .card-number {
+            font-family: monospace;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+        }
+
+        /* DevOps Status Widget */
+        .devops-widget {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-left: 5px solid var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .pulse {
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Transactions */
+        .transactions {
+            margin-top: 1rem;
+        }
+
+        .tx-list {
+            list-style: none;
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .tx-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            transition: background 0.3s ease;
+        }
+
+        .tx-item:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .tx-info h4 {
+            font-size: 1.1rem;
+        }
+
+        .tx-info p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 0.2rem;
+        }
+
+        .tx-amount.positive { color: var(--accent); }
+        .tx-amount.negative { color: #f43f5e; }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .nav-links {
+                flex-direction: row;
+                display: none; /* Hide on mobile for simplicity in demo */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#38bdf8" />
+                            <stop offset="100%" stop-color="#818cf8" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                NovaPay
+            </div>
+            <ul class="nav-links">
+                <li class="active">Dashboard</li>
+                <li>Transfers</li>
+                <li>Cards</li>
+                <li>Investments</li>
+                <li>Settings</li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h2 style="font-weight: 300;">Welcome back,</h2>
+                    <h1 style="font-size: 2rem;">Natasha Khandar</h1>
+                </div>
+                <div class="user-profile">
+                    <div class="avatar">NK</div>
+                </div>
+            </header>
+
+            <!-- DevOps Live Status Widget -->
+            <div class="glass-panel devops-widget">
+                <div>
+                    <h3 style="margin-bottom: 0.3rem;">Zero Downtime CI/CD Active</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Deployment: Canary Rollout (v2.0) | Infrastructure: EKS + ArgoCD</p>
+                </div>
+                <div class="status-indicator">
+                    <div class="pulse"></div>
+                    System Healthy
+                </div>
+            </div>
+
+            <!-- Balances -->
+            <div class="cards-grid">
+                <div class="glass-panel card">
+                    <div class="card-label">Primary Account</div>
+                    <div class="card-balance">$124,590.00</div>
+                    <div class="card-number">•••• •••• •••• 4209</div>
+                </div>
+                <div class="glass-panel card" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(129, 140, 248, 0.1));">
+                    <div class="card-label">Savings Vault</div>
+                    <div class="card-balance">$45,200.50</div>
+                    <div class="card-number">•••• •••• •••• 8812</div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="glass-panel transactions">
+                <h3>Recent Transactions</h3>
+                <ul class="tx-list">
+                    <li class="tx-item">
+                        <div class="tx-info">
+                            <h4>AWS Web Services</h4>
+                            <p>Today, 14:30 PM • Cloud Infrastructure</p>
+                        </div>
+                        <div class="tx-amount negative">-$450.00</div>
+                    </li>
+                    <li class="tx-item">
+                        <div class="tx-info">
+                            <h4>Salary Deposit</h4>
+                            <p>Yesterday, 09:00 AM • TechNova Corp</p>
+                        </div>
+                        <div class="tx-amount positive">+$8,500.00</div>
+                    </li>
+                    <li class="tx-item">
+                        <div class="tx-info">
+                            <h4>Starbucks Coffee</h4>
+                            <p>24 Jun, 08:15 AM • Food & Dining</p>
+                        </div>
+                        <div class="tx-amount negative">-$6.50</div>
+                    </li>
+                </ul>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
