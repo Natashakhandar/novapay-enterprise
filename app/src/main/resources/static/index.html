@@ -33,8 +33,9 @@
                 radial-gradient(circle at 85% 30%, rgba(129, 140, 248, 0.15), transparent 25%);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             padding: 2rem;
+            overflow-x: hidden;
         }
 
         .dashboard-container {
@@ -58,16 +59,14 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .glass-panel:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6);
-        }
-
         /* Sidebar */
         .sidebar {
             display: flex;
             flex-direction: column;
             gap: 2rem;
+            position: sticky;
+            top: 2rem;
+            height: max-content;
         }
 
         .brand {
@@ -95,6 +94,9 @@
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .nav-links li:hover, .nav-links li.active {
@@ -103,11 +105,16 @@
             border-left: 4px solid var(--primary);
         }
 
-        /* Main Content */
-        .main-content {
-            display: flex;
+        /* Sections */
+        .section {
+            display: none;
             flex-direction: column;
             gap: 2rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: flex;
         }
 
         .header {
@@ -145,23 +152,6 @@
             overflow: hidden;
         }
 
-        .card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            pointer-events: none;
-        }
-
-        .card:hover::before {
-            opacity: 1;
-        }
-
         .card-label {
             color: var(--text-muted);
             font-size: 0.9rem;
@@ -174,13 +164,6 @@
             font-size: 2.5rem;
             font-weight: 800;
             margin-bottom: 1rem;
-        }
-
-        .card-number {
-            font-family: monospace;
-            font-size: 1.1rem;
-            letter-spacing: 2px;
-            color: var(--text-muted);
         }
 
         /* DevOps Status Widget */
@@ -199,6 +182,7 @@
             gap: 0.5rem;
             color: var(--accent);
             font-weight: 600;
+            transition: color 0.3s ease;
         }
 
         .pulse {
@@ -210,11 +194,44 @@
             animation: pulse 1.5s infinite;
         }
 
-        /* Transactions */
-        .transactions {
-            margin-top: 1rem;
+        .btn {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+            font-family: 'Outfit', sans-serif;
         }
 
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Transfers Form */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border);
+            color: white;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Transactions */
         .tx-list {
             list-style: none;
             margin-top: 1.5rem;
@@ -233,10 +250,6 @@
             transition: background 0.3s ease;
         }
 
-        .tx-item:hover {
-            background: rgba(255,255,255,0.08);
-        }
-
         .tx-info h4 {
             font-size: 1.1rem;
         }
@@ -250,6 +263,25 @@
         .tx-amount.positive { color: var(--accent); }
         .tx-amount.negative { color: #f43f5e; }
 
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: -100px;
+            right: 20px;
+            background: var(--accent);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+            transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-weight: 600;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            bottom: 30px;
+        }
+
         /* Animations */
         @keyframes pulse {
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
@@ -257,26 +289,17 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
+        @keyframes pulse-yellow {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(234, 179, 8, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
+        }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Responsive */
-        @media (max-width: 900px) {
-            .dashboard-container {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
-            .nav-links {
-                flex-direction: row;
-                display: none; /* Hide on mobile for simplicity in demo */
-            }
-        }
     </style>
 </head>
 <body>
@@ -297,11 +320,9 @@
                 NovaPay
             </div>
             <ul class="nav-links">
-                <li class="active">Dashboard</li>
-                <li>Transfers</li>
-                <li>Cards</li>
-                <li>Investments</li>
-                <li>Settings</li>
+                <li class="active" onclick="switchSection('dashboard', this)">Dashboard</li>
+                <li onclick="switchSection('transfers', this)">Make a Transfer</li>
+                <li onclick="switchSection('devops', this)">DevOps Terminal</li>
             </ul>
         </aside>
 
@@ -317,61 +338,191 @@
                 </div>
             </header>
 
-            <!-- DevOps Live Status Widget -->
-            <div class="glass-panel devops-widget">
-                <div>
-                    <h3 style="margin-bottom: 0.3rem;">Zero Downtime CI/CD Active</h3>
-                    <p style="color: var(--text-muted); font-size: 0.9rem;">Deployment: Canary Rollout (v2.0) | Infrastructure: EKS + ArgoCD</p>
+            <!-- DASHBOARD SECTION -->
+            <section id="dashboard" class="section active">
+                <div class="cards-grid">
+                    <div class="glass-panel card">
+                        <div class="card-label">Primary Account</div>
+                        <div class="card-balance" id="main-balance">$124,590.00</div>
+                        <div class="card-number">•••• •••• •••• 4209</div>
+                    </div>
+                    <div class="glass-panel card" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(129, 140, 248, 0.1));">
+                        <div class="card-label">Savings Vault</div>
+                        <div class="card-balance">$45,200.50</div>
+                        <div class="card-number">•••• •••• •••• 8812</div>
+                    </div>
                 </div>
-                <div class="status-indicator">
-                    <div class="pulse"></div>
-                    System Healthy
-                </div>
-            </div>
 
-            <!-- Balances -->
-            <div class="cards-grid">
-                <div class="glass-panel card">
-                    <div class="card-label">Primary Account</div>
-                    <div class="card-balance">$124,590.00</div>
-                    <div class="card-number">•••• •••• •••• 4209</div>
+                <div class="glass-panel transactions">
+                    <h3>Recent Transactions</h3>
+                    <ul class="tx-list" id="tx-history">
+                        <li class="tx-item">
+                            <div class="tx-info">
+                                <h4>AWS Web Services</h4>
+                                <p>Today, 14:30 PM • Cloud Infrastructure</p>
+                            </div>
+                            <div class="tx-amount negative">-$450.00</div>
+                        </li>
+                        <li class="tx-item">
+                            <div class="tx-info">
+                                <h4>Salary Deposit</h4>
+                                <p>Yesterday, 09:00 AM • TechNova Corp</p>
+                            </div>
+                            <div class="tx-amount positive">+$8,500.00</div>
+                        </li>
+                    </ul>
                 </div>
-                <div class="glass-panel card" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(129, 140, 248, 0.1));">
-                    <div class="card-label">Savings Vault</div>
-                    <div class="card-balance">$45,200.50</div>
-                    <div class="card-number">•••• •••• •••• 8812</div>
-                </div>
-            </div>
+            </section>
 
-            <!-- Recent Transactions -->
-            <div class="glass-panel transactions">
-                <h3>Recent Transactions</h3>
-                <ul class="tx-list">
-                    <li class="tx-item">
-                        <div class="tx-info">
-                            <h4>AWS Web Services</h4>
-                            <p>Today, 14:30 PM • Cloud Infrastructure</p>
+            <!-- TRANSFERS SECTION -->
+            <section id="transfers" class="section">
+                <div class="glass-panel">
+                    <h3 style="margin-bottom: 2rem; font-size: 1.5rem;">Send Money</h3>
+                    <form id="transfer-form" onsubmit="handleTransfer(event)">
+                        <div class="form-group">
+                            <label>Recipient Name or Account Number</label>
+                            <input type="text" id="recipient" placeholder="e.g. John Doe" required>
                         </div>
-                        <div class="tx-amount negative">-$450.00</div>
-                    </li>
-                    <li class="tx-item">
-                        <div class="tx-info">
-                            <h4>Salary Deposit</h4>
-                            <p>Yesterday, 09:00 AM • TechNova Corp</p>
+                        <div class="form-group">
+                            <label>Amount ($)</label>
+                            <input type="number" id="amount" placeholder="0.00" min="1" max="100000" required>
                         </div>
-                        <div class="tx-amount positive">+$8,500.00</div>
-                    </li>
-                    <li class="tx-item">
-                        <div class="tx-info">
-                            <h4>Starbucks Coffee</h4>
-                            <p>24 Jun, 08:15 AM • Food & Dining</p>
-                        </div>
-                        <div class="tx-amount negative">-$6.50</div>
-                    </li>
-                </ul>
-            </div>
+                        <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Confirm Transfer</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- DEVOPS SECTION -->
+            <section id="devops" class="section">
+                <div class="glass-panel devops-widget" id="canary-widget">
+                    <div>
+                        <h3 style="margin-bottom: 0.3rem;">Zero Downtime Deployment Tracker</h3>
+                        <p id="canary-text" style="color: var(--text-muted); font-size: 0.9rem;">Stable Version (v1.0) receiving 100% Traffic.</p>
+                    </div>
+                    <div class="status-indicator" id="canary-status">
+                        <div class="pulse" id="canary-pulse"></div>
+                        System Healthy
+                    </div>
+                </div>
+
+                <div class="glass-panel" style="margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1rem;">Canary Traffic Controls</h3>
+                    <p style="margin-bottom: 2rem; color: var(--text-muted);">Use this to simulate Argo Rollouts progressively shifting traffic to the new v2.0 pods.</p>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn" onclick="simulateCanary(5)">Shift 5% Traffic</button>
+                        <button class="btn" onclick="simulateCanary(50)" style="background: #eab308;">Shift 50% Traffic</button>
+                        <button class="btn" onclick="simulateCanary(100)" style="background: #10b981;">Complete Rollout (100%)</button>
+                    </div>
+                </div>
+            </section>
+
         </main>
     </div>
 
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Action Completed!</div>
+
+    <script>
+        // Data State
+        let currentBalance = 124590.00;
+
+        // Navigation Logic
+        function switchSection(sectionId, clickedElement) {
+            // Update Active Link
+            document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
+            clickedElement.classList.add('active');
+
+            // Update Active Section
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Show Toast
+        function showToast(message, color = '#10b981') {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.style.background = color;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Transfer Logic
+        function handleTransfer(event) {
+            event.preventDefault();
+            const recipient = document.getElementById('recipient').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+
+            if(amount > currentBalance) {
+                showToast("Insufficient Funds!", "#f43f5e");
+                return;
+            }
+
+            // Deduct Balance
+            currentBalance -= amount;
+            
+            // Format to currency string
+            const formattedBalance = '$' + currentBalance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            const formattedAmount = '-$' + amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            // Update UI
+            document.getElementById('main-balance').innerText = formattedBalance;
+
+            // Add Transaction to History
+            const txList = document.getElementById('tx-history');
+            const newTx = document.createElement('li');
+            newTx.className = 'tx-item';
+            newTx.innerHTML = `
+                <div class="tx-info">
+                    <h4>Transfer to ${recipient}</h4>
+                    <p>Just Now • Online Transfer</p>
+                </div>
+                <div class="tx-amount negative">${formattedAmount}</div>
+            `;
+            // Insert at top
+            txList.insertBefore(newTx, txList.firstChild);
+
+            // Reset Form & Show Toast
+            document.getElementById('transfer-form').reset();
+            showToast(`Successfully transferred $${amount} to ${recipient}`);
+            
+            // Switch back to dashboard
+            setTimeout(() => {
+                switchSection('dashboard', document.querySelector('.nav-links li:first-child'));
+            }, 1500);
+        }
+
+        // DevOps Canary Simulation
+        function simulateCanary(percentage) {
+            const statusText = document.getElementById('canary-text');
+            const pulse = document.getElementById('canary-pulse');
+            const indicator = document.getElementById('canary-status');
+
+            if(percentage === 5) {
+                statusText.innerText = "Argo Rollouts deploying v2.0. Routing 5% traffic to Canary pods.";
+                pulse.style.backgroundColor = "#eab308";
+                pulse.style.animationName = "pulse-yellow";
+                indicator.style.color = "#eab308";
+                indicator.innerHTML = `<div class="pulse" id="canary-pulse" style="background:#eab308; animation-name:pulse-yellow;"></div> Analysis Running...`;
+                showToast("Canary Initiated: 5% Traffic", "#eab308");
+            } 
+            else if(percentage === 50) {
+                statusText.innerText = "Prometheus health checks passed. Scaling Canary to 50%.";
+                pulse.style.backgroundColor = "#38bdf8"; // blue
+                indicator.style.color = "#38bdf8";
+                indicator.innerHTML = `<div class="pulse" id="canary-pulse" style="background:#38bdf8;"></div> Expanding Traffic...`;
+                showToast("Traffic Shifted: 50%", "#38bdf8");
+            }
+            else if(percentage === 100) {
+                statusText.innerText = "Deployment Successful. v2.0 is now the Stable version (100% Traffic).";
+                pulse.style.backgroundColor = "#10b981"; // green
+                pulse.style.animationName = "pulse";
+                indicator.style.color = "#10b981";
+                indicator.innerHTML = `<div class="pulse" id="canary-pulse" style="background:#10b981; animation-name:pulse;"></div> System Healthy`;
+                showToast("Rollout Complete!", "#10b981");
+            }
+        }
+    </script>
 </body>
 </html>
