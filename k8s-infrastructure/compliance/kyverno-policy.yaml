@@ -1,0 +1,25 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-image-signature
+  annotations:
+    policies.kyverno.io/title: Require Image Signature (Cosign)
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Ensures that all images deployed to the cluster have been cryptographically signed
+      by the NovaPay CI pipeline, satisfying supply chain security requirements.
+spec:
+  validationFailureAction: enforce
+  background: false
+  rules:
+    - name: verify-image
+      match:
+        resources:
+          kinds:
+            - Pod
+      verifyImages:
+        - image: "ecr.aws/novapay/*"
+          key: |-
+            -----BEGIN PUBLIC KEY-----
+            MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE/YourNovaPayPublicKeyHere==
+            -----END PUBLIC KEY-----

@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: novapay-payments-prod
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: banking-core
+  source:
+    repoURL: 'https://github.com/NovaPay-Bank/novapay-enterprise.git'
+    targetRevision: HEAD
+    path: helm/novapay-api
+    helm:
+      valueFiles:
+        - values-prod.yaml
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: payments-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true # Prevents config drift (Compliance)
+    syncOptions:
+      - CreateNamespace=true

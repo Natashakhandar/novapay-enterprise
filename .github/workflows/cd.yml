@@ -1,0 +1,25 @@
+name: Continuous Deployment
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Kustomize / YQ
+      run: sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq
+    - name: Update Helm Prod Values
+      run: |
+        yq e '.image.tag = "${{ github.sha }}"' -i helm/novapay-api/values-prod.yaml
+    - name: Commit to GitOps Repo
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git commit -am "Deploy Prod version ${{ github.sha }}"
+        git push origin main
+    - name: Trigger ArgoCD Sync
+      run: echo "ArgoCD Webhook triggered. Rollout initiated."

@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  payments-api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_URL=jdbc:postgresql://db:5432/novapay
+      - DB_USER=nova_admin
+      - DB_PASSWORD=nova_secret
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=nova_admin
+      - POSTGRES_PASSWORD=nova_secret
+      - POSTGRES_DB=novapay
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nova_admin -d novapay"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

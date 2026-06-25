@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate-analysis
+  namespace: payments-prod
+spec:
+  metrics:
+  - name: success-rate
+    interval: 1m
+    successCondition: result[0] >= 0.99
+    failureLimit: 2
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: >+
+          sum(rate(http_requests_total{status!~"5.*", service="novapay-payments-canary"}[1m])) 
+          / 
+          sum(rate(http_requests_total{service="novapay-payments-canary"}[1m]))

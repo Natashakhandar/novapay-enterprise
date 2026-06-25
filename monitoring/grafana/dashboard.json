@@ -1,0 +1,20 @@
+{
+  "title": "NovaPay DORA Metrics & SLI Dashboard",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Deployment Frequency",
+      "targets": [
+        { "expr": "sum(increase(argocd_app_sync_total{status=\"Synced\"}[24h]))" }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "API Latency (P99)",
+      "targets": [
+        { "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))" }
+      ]
+    }
+  ],
+  "schemaVersion": 16
+}

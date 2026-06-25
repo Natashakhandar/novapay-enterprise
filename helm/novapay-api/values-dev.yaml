@@ -1,0 +1,21 @@
+replicaCount: 1
+
+image:
+  repository: ecr.aws/novapay/payments
+  tag: "latest"
+  pullPolicy: Always
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 200m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+
+config:
+  logLevel: DEBUG
+  dbHost: db.dev.internal

@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: novapay-payments
+  namespace: payments-prod
+spec:
+  replicas: 5
+  strategy:
+    canary:
+      canaryService: novapay-payments-canary
+      stableService: novapay-payments-stable
+      trafficRouting:
+        istio:
+          virtualService:
+            name: novapay-payments-vsvc
+            routes:
+            - primary
+      steps:
+      - setWeight: 5
+      - pause: {duration: 2m}
+      - analysis:
+          templates:
+          - templateName: success-rate-analysis
+      - setWeight: 20
+      - pause: {duration: 5m}
+      - setWeight: 50
+      - pause: {duration: 10m}
+      - setWeight: 100
+  selector:
+    matchLabels:
+      app: novapay-payments
+  template:
+    metadata:
+      labels:
+        app: novapay-payments
+    spec:
+      containers:
+      - name: payments-api
+        image: ecr.aws/novapay/payments:latest

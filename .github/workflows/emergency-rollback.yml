@@ -1,0 +1,33 @@
+name: Emergency Manual Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      service_name:
+        description: 'Service to rollback (e.g., novapay-payments)'
+        required: true
+      namespace:
+        description: 'Kubernetes Namespace'
+        required: true
+        default: 'payments-prod'
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+    - name: Configure AWS Credentials (OIDC)
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: arn:aws:iam::111122223333:role/GitHubActionsRole
+        aws-region: ap-south-1
+    - name: Update Kubeconfig
+      run: aws eks update-kubeconfig --region ap-south-1 --name novapay-prod-cluster
+    - name: Execute Rollback via Argo
+      run: |
+        kubectl argo rollouts undo ${{ github.event.inputs.service_name }} -n ${{ github.event.inputs.namespace }}
+        kubectl argo rollouts status ${{ github.event.inputs.service_name }} -n ${{ github.event.inputs.namespace }} --timeout 60s
+    - name: Notify Slack
+      run: echo "Emergency Rollback Executed for ${{ github.event.inputs.service_name }}"

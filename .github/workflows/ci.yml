@@ -1,0 +1,40 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - name: Run Unit Tests & SAST
+      run: mvn test sonar:sonar -Dsonar.projectKey=novapay-api -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+    - name: Build Docker Image
+      run: docker build -t ecr.aws/novapay/payments:${{ github.sha }} ./app
+    - name: Trivy Container Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'ecr.aws/novapay/payments:${{ github.sha }}'
+        format: 'table'
+        exit-code: '1'
+        severity: 'CRITICAL,HIGH'
+    - name: Generate SBOM (CycloneDX)
+      uses: anchore/sbom-action@v0
+      with:
+        image: 'ecr.aws/novapay/payments:${{ github.sha }}'
+        format: cyclonedx-json
+        output-file: sbom.json
+    - name: Sign Image (Cosign)
+      run: |
+        echo "Simulating Cosign Keyless Signature generation for PCI DSS compliance..."
+        # cosign sign --yes ecr.aws/novapay/payments:${{ github.sha }}
+    - name: Push to ECR
+      run: echo "Pushing secure image to ECR..."

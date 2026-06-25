@@ -1,0 +1,6 @@
+apiVersion: v2
+name: novapay-api
+description: NovaPay Core Banking API Helm Chart
+type: application
+version: 1.0.0
+appVersion: "1.0.0"

@@ -1,0 +1,24 @@
+name: DAST Automation
+
+on:
+  workflow_run:
+    workflows: ["Continuous Deployment"]
+    types:
+      - completed
+
+jobs:
+  dast_scan:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+    - name: Run OWASP ZAP Baseline Scan
+      uses: zaproxy/action-baseline@v0.9.0
+      with:
+        target: 'https://payments.novapay.com/api'
+        fail_action: true
+    - name: Upload ZAP Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: ZAP_Report
+        path: report_html.html
